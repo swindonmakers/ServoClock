@@ -119,6 +119,9 @@ void setup() {
     Serial.begin(115200);
     Serial.println("ServoClock");
 
+    Serial.println("Load settings");
+    settings.load();
+
     Serial.println("Init servos");
     tlc.init(D0, D1, D2);
 
