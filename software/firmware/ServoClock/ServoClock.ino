@@ -172,11 +172,11 @@ void setup() {
     Debug.begin(HOST_NAME);
     Debug.setResetCmdEnabled(true);
     Debug.setSerialEnabled(true);
-    String rdbCmds = "set_timezone n\n";
-    rdbCmds.concat("get_time\n");
-    rdbCmds.concat("set_digit n c\n");
-    Debug.setResetCmdEnabled(true);
+    String rdbCmds = "set_timezone <n> - set timezone offset to <n>\r\n";
+    rdbCmds.concat("get_time - output current time\r\n");
+    rdbCmds.concat("set_digit <n> <c> - set clock digit <n> to char <c>\r\n");
     Debug.setHelpProjectsCmds(rdbCmds);
+    Debug.setResetCmdEnabled(true);
     Debug.setCallBackProjectCmds(&processRemoteDebugCmd);
 
     // Setup time library to get time via ntp
