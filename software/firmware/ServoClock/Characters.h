@@ -31,7 +31,4 @@ CLOCKDIGIT CD7 { '7', 0b10100100 };
 CLOCKDIGIT CD8 { '8', 0b11111110 };
 CLOCKDIGIT CD9 { '9', 0b11110110 };
 
-
-// 2 & 4 need to go the other way
-
 #endif

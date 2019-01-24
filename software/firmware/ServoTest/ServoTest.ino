@@ -1,5 +1,5 @@
 /* 
- * Tests the basic function of the Hexaloop using the TLC5940 servo driver. 
+ * Tests the basic function of the Servos using the TLC5940 servo driver. 
  * Tests get more and more aggressive on power.
  */
 
@@ -15,7 +15,7 @@ Tiny5940 tlc;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("espTLC5940Hybrid");
+  Serial.println("ServoTest");
   
   // put your setup code here, to run once:
   Serial.println("init");

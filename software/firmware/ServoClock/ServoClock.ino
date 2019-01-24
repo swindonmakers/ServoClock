@@ -94,18 +94,25 @@ CLOCKDIGIT getClockDigit(char digit) {
     return SPACE;
 }
 
+///
+/// Set the n'th digit (0,1,2,3) on the display to show <digit> from Characters.h
+///
 void setDigit(int n, CLOCKDIGIT digit) {
     byte mask = 128;
     int servoNumber = 0;
     int pos = 0;
 
     DEBUG_D("Set digit %d to %c\n", n, digit.digit);
+
     for (int i=0; i<7; i++) {
         servoNumber = 7*n + i;
-        if (i == 2 || i == 4)
-            pos = 90 * ((digit.positions & mask) == mask);
-        else
-            pos = 90 * !((digit.positions & mask) == mask);
+
+        // work out if this segment be on or off
+        pos = !((digit.positions & mask) == mask);
+        if (i == 2 || i == 4) // servos 2 & 4 work the other way round to the rest
+            pos = !pos;
+        pos *= 90;
+
         DEBUG_D("Setting Servo %d to %d\n", servoNumber, pos);
         tlc.setServo(servoNumber, pos);
         mask = mask >> 1; 
@@ -163,8 +170,6 @@ void setup() {
     setSyncInterval(60 * 60); // every hour
 }
 
-int digit = 0;
-
 ///
 /// Standard Arduino loop, runs continuously
 ///
@@ -197,23 +202,6 @@ void loop()
             // tlc.setServo(0, 90);
             // etc...
 
-            //switch(digit) {
-            //    case 0: setDigit(0, CD0); break;
-            //    case 1: setDigit(0, CD1); break;
-            //    case 2: setDigit(0, CD2); break;
-            //    case 3: setDigit(0, CD3); break;
-            //    case 4: setDigit(0, CD4); break;
-            //    case 5: setDigit(0, CD5); break;
-            //    case 6: setDigit(0, CD6); break;
-            //    case 7: setDigit(0, CD7); break;
-            //    case 8: setDigit(0, CD8); break;
-            //    case 9: setDigit(0, CD9); break;
-            //}
-//
-            //digit++;
-            //if (digit > 9)
-            //    digit = 0;
-//
         }
     }
 }
