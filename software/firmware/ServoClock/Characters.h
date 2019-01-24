@@ -18,7 +18,9 @@ struct CLOCKDIGIT {
     char positions;
 };
 
-CLOCKDIGIT SPACE { ' ', 0b00000000 };
+#define N_DIGITS 11
+
+CLOCKDIGIT CDSPACE { ' ', 0b00000000 };
 
 CLOCKDIGIT CD0 { '0', 0b11101110 };
 CLOCKDIGIT CD1 { '1', 0b00100100 };
@@ -30,5 +32,21 @@ CLOCKDIGIT CD6 { '6', 0b11011110 };
 CLOCKDIGIT CD7 { '7', 0b10100100 }; 
 CLOCKDIGIT CD8 { '8', 0b11111110 };
 CLOCKDIGIT CD9 { '9', 0b11110110 };
+
+
+CLOCKDIGIT allDigits[N_DIGITS] = 
+{ 
+  CDSPACE,
+  CD0,
+  CD1,
+  CD2,
+  CD3,
+  CD4,
+  CD5,
+  CD6,
+  CD7,
+  CD8,
+  CD9
+} ;
 
 #endif

@@ -76,22 +76,38 @@ void processRemoteDebugCmd() {
     }
 }
 
+///
+/// Returns the CLOCKDIGIT for the given char
+/// so the servo positions can be set.
+///
 CLOCKDIGIT getClockDigit(char digit) {
-    switch(digit) {
-        case ' ': return SPACE;
-        case '0': return CD0;
-        case '1': return CD1;
-        case '2': return CD2;
-        case '3': return CD3;
-        case '4': return CD4;
-        case '5': return CD5;
-        case '6': return CD6;
-        case '7': return CD7;
-        case '8': return CD8;
-        case '9': return CD9;
-    }
+    // Search all known digits for a match
+    for (int i=0; i<N_DIGITS; i++)
+        if (allDigits[i].digit == digit)
+            return allDigits[i];
+    
+    // Default return if nothing found
+    return CDSPACE;
+}
 
-    return SPACE;
+///
+/// Returns the CLOCKDIGIT for the given int
+///
+CLOCKDIGIT getClockDigit(int n) {
+    switch (n) {
+        case 0: return CD0;
+        case 1: return CD1;
+        case 2: return CD2;
+        case 3: return CD3;
+        case 4: return CD4;
+        case 5: return CD5;
+        case 6: return CD6;
+        case 7: return CD7;
+        case 8: return CD8;
+        case 9: return CD9;
+        
+        default: return CDSPACE;
+    }
 }
 
 ///
