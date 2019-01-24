@@ -74,6 +74,19 @@ void processRemoteDebugCmd() {
         DEBUG("Setting digit %d to %c", n, c);
         setDigit(n, getClockDigit(c));
         tlc.update();
+
+    } else if (cmd.startsWith("show")) {
+        String msg = cmd.substring(5);
+        msg.toUpperCase();
+        DEBUG("Show message: %s\n", msg.c_str());
+        for (int i=0; i<4; i++) {
+            if (i < msg.length())
+                setDigit(i, getClockDigit(msg[i]));
+            else
+                setDigit(i, CDSPACE);
+        }
+        tlc.update();
+
     }
 }
 
@@ -175,6 +188,7 @@ void setup() {
     String rdbCmds = "set_timezone <n> - set timezone offset to <n>\r\n";
     rdbCmds.concat("get_time - output current time\r\n");
     rdbCmds.concat("set_digit <n> <c> - set clock digit <n> to char <c>\r\n");
+    rdbCmds.concat("show <msg> - display <msg> on the clock (max 4 chars)\r\n");
     Debug.setHelpProjectsCmds(rdbCmds);
     Debug.setResetCmdEnabled(true);
     Debug.setCallBackProjectCmds(&processRemoteDebugCmd);
