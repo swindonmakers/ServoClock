@@ -73,6 +73,7 @@ void processRemoteDebugCmd() {
         char c = cmd.substring(12, 13)[0];
         DEBUG("Setting digit %d to %c", n, c);
         setDigit(n, getClockDigit(c));
+        tlc.update();
     }
 }
 
@@ -105,7 +106,7 @@ CLOCKDIGIT getClockDigit(int n) {
         case 7: return CD7;
         case 8: return CD8;
         case 9: return CD9;
-        
+
         default: return CDSPACE;
     }
 }
@@ -194,7 +195,6 @@ void loop()
     // Do some housekeeping tasks required by libraries
     Debug.handle();
     ntp.loop();
-    tlc.update(); // TODO: maybe only call this when we know there are servo updates pending
 
     if (millis() - lastDebug > DEBUG_INTERVAL_MS) {
         lastDebug = millis();
@@ -213,11 +213,25 @@ void loop()
             lastMinute = minute(t);
 
             DEBUG("Updating clock at: %s\n", formatTime(t).c_str());
-            // TODO: update clock display
-            // tlc.setServo(servoNumber, position);
-            // tlc.setServo(0, 90);
-            // etc...
 
+            if (hour(t) < 10)
+                setDigit(0, CDSPACE);
+            else if (hour(t) < 20)
+                setDigit(0, CD1);
+            else
+                setDigit(0, CD2);
+            
+            setDigit(1, getClockDigit(hour(t) % 10));
+            setDigit(2, getClockDigit((minute(t) - (minute(t) % 10)) / 10));
+            setDigit(3, getClockDigit(minute(t) % 10));
+
+            tlc.update();
         }
+    
+    } else {
+        // Blank the display
+        for (int i=0; i<4; i++)
+            setDigit(i, CDSPACE);
+        tlc.update();
     }
 }
