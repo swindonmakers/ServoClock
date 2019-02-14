@@ -29,6 +29,9 @@ Tiny5940 tlc;
 static unsigned long lastDebug = 0; // Last time debug data was output from the mainloop
 static int lastMinute = 0; // Last minute of the hour that we updated the clock display
 
+static unsigned long holdUntil = 0; // millis() time to hold the current display until
+static unsigned long holdTimeMs = 60 * 1000; // time to keep a (non-time) message on display
+
 ///
 /// Called by the time libraries when a timesync is due
 /// signal the ntp library to update the time
@@ -68,12 +71,20 @@ void processRemoteDebugCmd() {
         DEBUG("Utc time is: %s\n", formatTime(now()).c_str());
         DEBUG("Local time is: %s\n", formatTime(ntp.localNow()).c_str());
 
+    } else if (cmd.startsWith("set_holdtime")) {
+        int n = cmd.substring(13).toInt();
+        if (n > 600) // max 10 mins?
+            n = 600;
+        holdTimeMs = n * 1000;
+        DEBUG("Hold time set to: %d secs\n", n);
+
     } else if (cmd.startsWith("set_digit")) {
         int n = cmd.substring(10, 11).toInt();
         char c = cmd.substring(12, 13)[0];
         DEBUG("Setting digit %d to %c", n, c);
         setDigit(n, getClockDigit(c));
         tlc.update();
+        holdDisplay();
 
     } else if (cmd.startsWith("show")) {
         String msg = cmd.substring(5);
@@ -86,8 +97,16 @@ void processRemoteDebugCmd() {
                 setDigit(i, CDSPACE);
         }
         tlc.update();
+        holdDisplay();
 
     }
+}
+
+///
+/// hold current display for the set time to stop time updates overriding it
+///
+void holdDisplay() {
+    holdTimeMs = millis() + holdTimeMs;
 }
 
 ///
@@ -188,6 +207,7 @@ void setup() {
     String rdbCmds = "set_timezone <n> - set timezone offset to <n>\r\n";
     rdbCmds.concat("get_time - output current time\r\n");
     rdbCmds.concat("set_digit <n> <c> - set clock digit <n> to char <c>\r\n");
+    rdbCmds.concat("set_holdtime <n> - set custom message display time to <n> secs (max 600)\r\n");
     rdbCmds.concat("show <msg> - display <msg> on the clock (max 4 chars)\r\n");
     Debug.setHelpProjectsCmds(rdbCmds);
     Debug.setResetCmdEnabled(true);
@@ -222,9 +242,12 @@ void loop()
         // Time is set, do some actions like update the display
         time_t t = ntp.localNow();
         
-        if (minute(t) != lastMinute) {
+        // Update the display with the current time if the minute has changed
+        // and we aren't holding a message
+        if (minute(t) != lastMinute && millis() > holdUntil) {
             // Update display only once per minute
             lastMinute = minute(t);
+            holdUntil = 0;
 
             DEBUG("Updating clock at: %s\n", formatTime(t).c_str());
 
