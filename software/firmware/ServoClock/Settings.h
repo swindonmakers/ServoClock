@@ -3,7 +3,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#define HOST_NAME "servoclock"
+#define HOST_NAME "SERVOCLOCK"
 #define WIFI_SSID "SET_SSID_HERE"
 #define WIFI_PWD "SET_PWD_HERE"
 

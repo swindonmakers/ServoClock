@@ -106,7 +106,7 @@ void processRemoteDebugCmd() {
 /// hold current display for the set time to stop time updates overriding it
 ///
 void holdDisplay() {
-    holdTimeMs = millis() + holdTimeMs;
+    holdUntil = millis() + holdTimeMs;
 }
 
 ///
@@ -191,9 +191,7 @@ void setup() {
 
     Serial.printf("Connected to %s, IP %s\n", WiFi.SSID().c_str(), WiFi.localIP().toString().c_str());
 
-    String hostNameWifi = HOST_NAME;
-    hostNameWifi.concat(".local");
-    WiFi.hostname(hostNameWifi);
+    WiFi.hostname(HOST_NAME);
 
     if (MDNS.begin(HOST_NAME)) {
         Serial.printf("* MDNS responder started. Hostname -> %s\n", HOST_NAME);
