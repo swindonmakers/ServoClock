@@ -9,8 +9,8 @@
 */
 
 #include <DNSServer.h>
-#include <ESP8266mDNS.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 #include <RhaNtp.h>
 #include <RemoteDebug.h>
 #include <TimeLib.h>
@@ -180,6 +180,9 @@ void setup() {
 
     Serial.println("Init servos");
     tlc.init(D0, D1, D2);
+    tlc.setAllServo(45);
+    delay(50); // wait for long enough that update wont abort
+    tlc.update();
 
     Serial.print("Connecting to Wifi");
     WiFi.begin(WIFI_SSID, WIFI_PWD);
@@ -263,7 +266,7 @@ void loop()
             tlc.update();
         }
     
-    } else {
+    } else if (millis() > 30000) {
         // Blank the display
         for (int i=0; i<4; i++)
             setDigit(i, CDSPACE);
