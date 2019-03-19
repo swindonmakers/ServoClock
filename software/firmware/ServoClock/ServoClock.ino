@@ -99,6 +99,9 @@ void processRemoteDebugCmd() {
         tlc.update();
         holdDisplay();
 
+    } else if (cmd.startsWith("time")) {
+        holdUntil = 0;
+        displayTime();
     }
 }
 
@@ -168,6 +171,25 @@ void setDigit(int n, CLOCKDIGIT digit) {
     }
 }
 
+void displayTime() {
+    time_t t = ntp.localNow();
+
+    DEBUG("Updating clock at: %s\n", formatTime(t).c_str());
+
+    if (hour(t) < 10)
+        setDigit(0, CDSPACE);
+    else if (hour(t) < 20)
+        setDigit(0, CD1);
+    else
+        setDigit(0, CD2);
+    
+    setDigit(1, getClockDigit(hour(t) % 10));
+    setDigit(2, getClockDigit((minute(t) - (minute(t) % 10)) / 10));
+    setDigit(3, getClockDigit(minute(t) % 10));
+
+    tlc.update();
+}
+
 ///
 /// Standard Arduino setup code - runs at startup
 ///
@@ -209,6 +231,7 @@ void setup() {
     rdbCmds.concat("get_time - output current time\r\n");
     rdbCmds.concat("set_digit <n> <c> - set clock digit <n> to char <c>\r\n");
     rdbCmds.concat("set_holdtime <n> - set custom message display time to <n> secs (max 600)\r\n");
+    rdbCmds.concat("time - display time\r\n");
     rdbCmds.concat("show <msg> - display <msg> on the clock (max 4 chars)\r\n");
     Debug.setHelpProjectsCmds(rdbCmds);
     Debug.setResetCmdEnabled(true);
@@ -249,21 +272,7 @@ void loop()
             // Update display only once per minute
             lastMinute = minute(t);
             holdUntil = 0;
-
-            DEBUG("Updating clock at: %s\n", formatTime(t).c_str());
-
-            if (hour(t) < 10)
-                setDigit(0, CDSPACE);
-            else if (hour(t) < 20)
-                setDigit(0, CD1);
-            else
-                setDigit(0, CD2);
-            
-            setDigit(1, getClockDigit(hour(t) % 10));
-            setDigit(2, getClockDigit((minute(t) - (minute(t) % 10)) / 10));
-            setDigit(3, getClockDigit(minute(t) % 10));
-
-            tlc.update();
+            displayTime();
         }
     
     } else if (millis() > 30000) {
