@@ -164,10 +164,10 @@ module back() {
 		// Servo wire exits
 		for(i=[0,1])
 		mirror([i, 0, 0])
-		translate([-45, -frontHeight/2, 0]) {
-			square([20, 20], center=true);
+		translate([-42, -frontHeight/2, 0]) {
+			square([24, 20], center=true);
 			translate([0, 10, 0])
-				circle(d=20);
+				circle(d=24);
 		}
 			
 		// Power wire exits
@@ -183,11 +183,11 @@ module back() {
 		for (i=[0,1])
 		mirror([i, 0, 0])
 		translate([-70, 25, 0]) {
-			square([7, 20], center=true);
-			translate([0, 20/2, 0])
-				circle(d=7);
-			translate([0, -20/2, 0])
-				circle(d=15);
+			square([4, 15], center=true);
+			translate([0, 15/2, 0])
+				circle(d=4);
+			translate([0, -15/2, 0])
+				circle(d=12);
 		}
 	}
 }
