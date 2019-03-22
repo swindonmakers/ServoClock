@@ -31,7 +31,7 @@
 
         function showMessage() {
             let msg = document.getElementById('message').value;
-            fetch('/members?msg=' + msg)
+            fetch('/message?msg=' + msg)
                 .then((r) => r.text()
                     .then((t) => logReply(t)))
             .catch((e) => logErr(e));

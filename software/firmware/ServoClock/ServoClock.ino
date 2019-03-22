@@ -57,6 +57,21 @@ String formatTime(time_t t) {
 }
 
 ///
+/// format bytes
+///
+String formatBytes(size_t bytes) {
+  if (bytes < 1024) {
+    return String(bytes) + "B";
+  } else if (bytes < (1024 * 1024)) {
+    return String(bytes / 1024.0) + "KB";
+  } else if (bytes < (1024 * 1024 * 1024)) {
+    return String(bytes / 1024.0 / 1024.0) + "MB";
+  } else {
+    return String(bytes / 1024.0 / 1024.0 / 1024.0) + "GB";
+  }
+}
+
+///
 /// Called by Debug to process commands received over telnet
 ///
 void processRemoteDebugCmd() {
@@ -270,6 +285,7 @@ void showMessage(String msg) {
 ///
 void showMembers() {
     // TODO:
+    DEBUG("Show members\n");
 }
 
 ///
@@ -321,6 +337,16 @@ void setup() {
     Debug.setHelpProjectsCmds(rdbCmds);
     Debug.setResetCmdEnabled(true);
     Debug.setCallBackProjectCmds(&processRemoteDebugCmd);
+
+    // Start FS and dump out files
+    SPIFFS.begin();
+    Dir dir = SPIFFS.openDir("/");
+    while (dir.next()) {
+        String fileName = dir.fileName();
+        size_t fileSize = dir.fileSize();
+        Debug.printf("FS File: %s, size: %s\n", fileName.c_str(), formatBytes(fileSize).c_str());
+    }
+    Debug.printf("\n");
 
     // Setup time library to get time via ntp
     IPAddress timeServerIP;
