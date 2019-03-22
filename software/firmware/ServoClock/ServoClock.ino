@@ -90,7 +90,7 @@ void processRemoteDebugCmd() {
         String msg = cmd.substring(5);
         msg.toUpperCase();
         DEBUG("Show message: %s\n", msg.c_str());
-        for (int i=0; i<4; i++) {
+        for (uint8_t i=0; i<4; i++) {
             if (i < msg.length())
                 setDigit(i, getClockDigit(msg[i]));
             else
