@@ -102,7 +102,20 @@ void processRemoteDebugCmd() {
     } else if (cmd.startsWith("time")) {
         holdUntil = 0;
         displayTime();
+    
+    } else if (cmd.startsWith("get_trims")) {
+        for (int i = 0; i < N_SERVOS; i++)
+            DEBUG("servo:%d, trim:%d\n", i, settings.servoTrims[i]);
+    
+    } else if (cmd.startsWith("set_trim")) {
+        int servoNumber = cmd.substring(9, cmd.indexOf('=')).toInt();
+        int trim = cmd.substring(cmd.indexOf('=') + 1).toInt();
+        DEBUG("Trim servo %d by %d\n", servoNumber, trim);
+        settings.servoTrims[servoNumber] = trim;
+        settings.save();
+        
     }
+
 }
 
 ///
@@ -164,6 +177,9 @@ void setDigit(int n, CLOCKDIGIT digit) {
         if (i == 2 || i == 4) // servos 2 & 4 work the other way round to the rest
             pos = !pos;
         pos *= 90;
+
+        // apply servo offsets
+        pos += settings.servoTrims[servoNumber];
 
         DEBUG_D("Setting Servo %d to %d\n", servoNumber, pos);
         tlc.setServo(servoNumber, pos);
@@ -231,6 +247,8 @@ void setup() {
     rdbCmds.concat("get_time - output current time\r\n");
     rdbCmds.concat("set_digit <n> <c> - set clock digit <n> to char <c>\r\n");
     rdbCmds.concat("set_holdtime <n> - set custom message display time to <n> secs (max 600)\r\n");
+    rdbCmds.concat("get_trims - show the current servo trim values\r\n");
+    rdbCmds.concat("set_trim <n>=<t> - set the trim for servo <n> to <t> (note: trim wont be applied until next time the servos move)\r\n");
     rdbCmds.concat("time - display time\r\n");
     rdbCmds.concat("show <msg> - display <msg> on the clock (max 4 chars)\r\n");
     Debug.setHelpProjectsCmds(rdbCmds);
