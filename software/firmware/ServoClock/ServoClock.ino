@@ -10,17 +10,21 @@
 
 #include <DNSServer.h>
 #include <ESP8266WiFi.h>
+#include <WiFiClient.h>
+#include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <RhaNtp.h>
 #include <RemoteDebug.h>
 #include <TimeLib.h>
 #include <Tiny5940.h>
 #include <WiFiUdp.h>
+#include <FS.h>
 
 #include "Settings.h"
 #include "Characters.h"
 
 RemoteDebug Debug;
+ESP8266WebServer server(80);
 Settings settings;
 RhaNtp ntp;
 Tiny5940 tlc;
@@ -88,19 +92,9 @@ void processRemoteDebugCmd() {
 
     } else if (cmd.startsWith("show")) {
         String msg = cmd.substring(5);
-        msg.toUpperCase();
-        DEBUG("Show message: %s\n", msg.c_str());
-        for (uint8_t i=0; i<4; i++) {
-            if (i < msg.length())
-                setDigit(i, getClockDigit(msg[i]));
-            else
-                setDigit(i, CDSPACE);
-        }
-        tlc.update();
-        holdDisplay();
+        showMessage(msg);
 
     } else if (cmd.startsWith("time")) {
-        holdUntil = 0;
         displayTime();
     
     } else if (cmd.startsWith("get_trims")) {
@@ -115,7 +109,52 @@ void processRemoteDebugCmd() {
         settings.save();
         
     }
+}
 
+///
+/// web handler for /showMessage?msg=HiHi
+///
+void handleMessage() {
+    if (server.hasArg("msg")) {
+        showMessage(server.arg("msg"));
+        server.send(200, "text/plain", "ok");
+    
+    } else {
+        server.send(500, "text/plain", "err - no msg");
+    }
+}
+
+///
+/// returns the conent type for a file
+///
+String getContentType(String filename) {
+    if (filename.endsWith(".htm")) {
+        return "text/html";
+    } else if (filename.endsWith(".html")) {
+        return "text/html";
+    } else if (filename.endsWith(".css")) {
+        return "text/css";
+    } else if (filename.endsWith(".png")) {
+        return "image/png";
+    }
+    return "text/plain";
+}
+
+///
+/// deal with serving files out from SPIFFS internal flash filesystem
+///
+bool handleFileRead(String path) {
+  if (path.endsWith("/")) {
+    path += "index.htm";
+  }
+  String contentType = getContentType(path);
+  if (SPIFFS.exists(path)) {
+    File file = SPIFFS.open(path, "r");
+    server.streamFile(file, contentType);
+    file.close();
+    return true;
+  }
+  return false;
 }
 
 ///
@@ -187,7 +226,11 @@ void setDigit(int n, CLOCKDIGIT digit) {
     }
 }
 
+///
+/// puts the clock in time display mode and shows the current time
+///
 void displayTime() {
+    holdUntil = 0;
     time_t t = ntp.localNow();
 
     DEBUG("Updating clock at: %s\n", formatTime(t).c_str());
@@ -204,6 +247,29 @@ void displayTime() {
     setDigit(3, getClockDigit(minute(t) % 10));
 
     tlc.update();
+}
+
+///
+/// display a custom message on the clock
+///
+void showMessage(String msg) {
+    msg.toUpperCase();
+    DEBUG("Show message: %s\n", msg.c_str());
+    for (uint8_t i=0; i<4; i++) {
+        if (i < msg.length())
+            setDigit(i, getClockDigit(msg[i]));
+        else
+            setDigit(i, CDSPACE);
+    }
+    tlc.update();
+    holdDisplay();
+}
+
+///
+/// show count of makerspace members
+///
+void showMembers() {
+    // TODO:
 }
 
 ///
@@ -237,6 +303,7 @@ void setup() {
     if (MDNS.begin(HOST_NAME)) {
         Serial.printf("* MDNS responder started. Hostname -> %s\n", HOST_NAME);
         MDNS.addService("telnet", "tcp", 23);
+        MDNS.addService("http", "tcp", 80);
     }
 
     // Setup telnet debug library
@@ -261,6 +328,16 @@ void setup() {
     ntp.init(timeServerIP, settings.timezone);
     setSyncProvider(requestTime);
     setSyncInterval(60 * 60); // every hour
+
+    // Setup webserver
+    server.on("/time", []() { displayTime(); server.send(200, "text/plain", "ok"); });
+    server.on("/members", []() { showMembers(); server.send(200, "text/plain", "ok"); });
+    server.on("/message", handleMessage);
+    server.onNotFound( []() { 
+        if (!handleFileRead(server.uri()))
+            server.send ( 404, "text/plain", "page not found" ); 
+        });
+    server.begin();
 }
 
 ///
@@ -271,6 +348,8 @@ void loop()
     // Do some housekeeping tasks required by libraries
     Debug.handle();
     ntp.loop();
+    MDNS.update();
+    server.handleClient();
 
     if (millis() - lastDebug > DEBUG_INTERVAL_MS) {
         lastDebug = millis();

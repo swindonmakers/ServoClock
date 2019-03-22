@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Servo Clock</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link type="text/css" rel="stylesheet" href="style.css" />
+    <script>
+        function logReply(txt) {
+            document.getElementById('log').innerText = txt;
+            setTimeout(() => document.getElementById('log').innerText = '', 5000);
+        }
+
+        function logErr(txt) {
+            document.getElementById('err').innerText = txt;
+            setTimeout(() => document.getElementById('err').innerText = '', 5000);
+        }
+
+        function showTime() {
+            fetch('/time')
+                .then((r) => r.text()
+                    .then((t) => logReply(t)))
+            .catch((e) => logErr(e));
+        }
+        
+        function showMembers() {
+            fetch('/members')
+                .then((r) => r.text()
+                    .then((t) => logReply(t)))
+            .catch((e) => logErr(e));
+        }
+
+        function showMessage() {
+            let msg = document.getElementById('message').value;
+            fetch('/members?msg=' + msg)
+                .then((r) => r.text()
+                    .then((t) => logReply(t)))
+            .catch((e) => logErr(e));
+        }
+    </script>
+</head>
+<body>
+    <div class="t"><img src="makerspace-logo.png" width="50" height="50" /> Servo Clock</div>
+    
+    <p><button onclick="showTime()">Show Time</button></p>
+    
+    <p><button onclick="showMembers()">Show Member Count</button></p>
+
+    <p>
+        <input type="text" id="message" maxlength="4" placeholder="message" value="HiHi"></input><br>
+        <button onclick="showMessage()">Show Message</button>
+    </p>
+
+    <p id="log"></p>
+    <p id="err"></p>
+</body>
+</html>

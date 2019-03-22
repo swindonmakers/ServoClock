@@ -1,0 +1,68 @@
+.c {
+    text-align: center;
+}
+
+.tt {
+    text-align: right;
+    font-weight: bold;
+}
+
+body {
+    padding: 0px;
+    margin: 0px;
+    font-size: 0.9em;
+}
+
+input {
+    padding: 5px;
+    font-size: 1em;
+}
+
+body {
+    font-family: verdana;
+    text-align: center;
+}
+
+button {
+    border: 0;
+    border-radius: 0.3rem;
+    background-color: #ff7700;
+    color: #fff;
+    line-height: 2.4rem;
+    font-size: 1.2rem;
+    width: 95%;
+    max-width: 250px;
+}
+
+.q {
+    float: right;
+    width: 64px;
+    text-align: right;
+}
+
+.t {
+    padding: 10px;
+    margin-bottom: 5px;
+    font-variant: small-caps;
+    font-size: 2em;
+    text-align: center;
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+td {
+    text-align: left;
+}
+
+#log {
+    background: green;
+    color: #fff;
+}
+
+#err {
+    background: red;
+    color: #fff;
+}
