@@ -1,10 +1,10 @@
 /*
-    Using Arduino ESP8266 Core v2.4.2
+    Using Arduino ESP8266 Core v2.5.0
     Flash as
      - Board: NodeMCU 1.0 (12E Module)
      - Debug: None
      - Cpu : 80Mhz
-     - Flash Size: 4M (3M SPIFFS)
+     - Flash Size: 4M (1M SPIFFS)
      - IwIP Variant v2 Lower Memory
 */
 
