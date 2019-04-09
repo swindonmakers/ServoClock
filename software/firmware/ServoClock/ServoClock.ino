@@ -305,6 +305,7 @@ void setup() {
     tlc.update();
 
     Serial.print("Connecting to Wifi");
+    WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PWD);
     while (WiFi.status() != WL_CONNECTED) {
       delay(500);
