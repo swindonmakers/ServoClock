@@ -36,9 +36,19 @@
                     .then((t) => logReply(t)))
             .catch((e) => logErr(e));
         }
+
+        function attachEvents() {
+            var input = document.getElementById("message");
+            input.addEventListener("keyup", function(event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                    showMessage();
+                }
+            });
+        }
     </script>
 </head>
-<body>
+<body onload="attachEvents()">
     <div class="t"><img src="makerspace-logo.png" width="50" height="50" /> Servo Clock</div>
     
     <p><button onclick="showTime()">Show Time</button></p>
