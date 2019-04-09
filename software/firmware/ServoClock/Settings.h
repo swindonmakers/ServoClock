@@ -7,6 +7,9 @@
 #define WIFI_SSID "SET_SSID_HERE"
 #define WIFI_PWD "SET_PWD_HERE"
 
+#define UPDATE_USER "admin"
+#define UPDATE_PASS "servoclock"
+
 #define EEPROM_WIFI_SIZE 512
 #define EEPROM_MAGIC_VAL "CLK2"
 

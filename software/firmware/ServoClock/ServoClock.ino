@@ -12,6 +12,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266HTTPUpdateServer.h> // Local version from https://github.com/esp8266/Arduino/pull/2701/files to replace ESP8266 builtin lib so we can do SPIFFS OTA
 #include <ESP8266mDNS.h>
 #include <RhaNtp.h>
 #include <RemoteDebug.h>
@@ -25,6 +26,7 @@
 
 RemoteDebug Debug;
 ESP8266WebServer server(80);
+ESP8266HTTPUpdateServer httpUpdater;
 Settings settings;
 RhaNtp ntp;
 Tiny5940 tlc;
@@ -355,6 +357,9 @@ void setup() {
     ntp.init(timeServerIP, settings.timezone);
     setSyncProvider(requestTime);
     setSyncInterval(60 * 60); // every hour
+
+    // Enable OTA firmware updates
+    httpUpdater.setup(&server, "/firmware", UPDATE_USER, UPDATE_PASS);
 
     // Setup webserver
     server.on("/time", []() { displayTime(); server.send(200, "text/plain", "ok"); });
