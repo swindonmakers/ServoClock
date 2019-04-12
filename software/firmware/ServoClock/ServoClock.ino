@@ -237,6 +237,12 @@ void setDigit(int n, CLOCKDIGIT digit) {
         // apply servo offsets
         pos += settings.servoTrims[servoNumber];
 
+        // limit range
+        if (pos < 0)
+            pos = 0;
+        else if (pos > 180)
+            pos = 180;
+
         DEBUG_D("Setting Servo %d to %d\n", servoNumber, pos);
         tlc.setServo(servoNumber, pos);
         mask = mask >> 1; 

@@ -11,7 +11,7 @@
 #define UPDATE_PASS "servoclock"
 
 #define EEPROM_WIFI_SIZE 512
-#define EEPROM_MAGIC_VAL "CLK2"
+#define EEPROM_MAGIC_VAL "CLK3"
 
 #define N_SERVOS 28
 
@@ -21,7 +21,7 @@ class Settings
 
     char timeserver[64];
     uint8_t timezone;
-    uint8_t servoTrims[N_SERVOS];
+    int8_t servoTrims[N_SERVOS];
 
     Settings() 
     {
