@@ -1,11 +1,11 @@
 /*
-    Using Arduino ESP8266 Core v2.5.0
+    Using Arduino ESP8266 Core v2.7.4
     Flash as
      - Board: NodeMCU 1.0 (12E Module)
      - Debug: None
      - Cpu : 80Mhz
      - Flash Size: 4M (1M SPIFFS)
-     - IwIP Variant v2 Lower Memory
+     - IwIP Variant v2 Lower Memory (no features)
 */
 
 #include <DNSServer.h>
@@ -314,6 +314,7 @@ void setup() {
 
     Serial.print("Connecting to Wifi");
     WiFi.mode(WIFI_STA);
+    WiFi.setSleepMode(WIFI_NONE_SLEEP);
     WiFi.begin(WIFI_SSID, WIFI_PWD);
     while (WiFi.status() != WL_CONNECTED) {
       delay(500);
